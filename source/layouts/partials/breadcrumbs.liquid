@@ -1,0 +1,12 @@
+<nav>
+	<ol class="flow flow-small">
+		{% for crumb in breadcrumbs %}
+			{% if forloop.last %}
+				{% assign ariaCurrent = ' aria-current="page"' %}
+			{% else %}
+				{% assign ariaCurrent = '' %}
+			{% endif %}
+			<li><span aria-hidden="true">/&nbsp;</span><a href="{{ crumb.url }}"{{ ariaCurrent }}>{{ crumb.label }}</a></li>
+		{% endfor %}
+	</ul>
+</nav>

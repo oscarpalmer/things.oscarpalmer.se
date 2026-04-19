@@ -1,0 +1,22 @@
+---
+pagination:
+  data: generated.packages.multiple
+  size: 1
+  alias: paginated
+layout: default
+permalink: /{{ paginated.name.slug }}/index.html
+---
+<header class="stack stack--text">
+	<h1>{{ paginated.json.name }}</h1>
+	<p>{{ paginated.json.description }}</p>
+</header>
+
+<h2>Exports</h2>
+
+<ul class="flow">
+  {% for exp in paginated.exports %}
+    <li class="oui-card">
+      <a href="{{ exp.url }}">{{ exp.name.original }}</a>
+    </li>
+  {% endfor %}
+</ul>

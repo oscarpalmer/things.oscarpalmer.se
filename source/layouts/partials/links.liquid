@@ -1,0 +1,9 @@
+{% if items.length > 0 %}
+  <ul class="stack stack-small">
+    {% for item in items %}
+      <li>
+        <a href="{{ item.url }}">{{ item.name.original }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}

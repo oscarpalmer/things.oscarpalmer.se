@@ -1,18 +1,13 @@
 ---
 layout: default
 ---
-<h1 aria-hidden="false" hidden>Cool things I am working on <i>(for myself)</i></h1>
 
-{% if items.length > 0 %}
-  <ul>
-    {% for item in items %}
-      <li>{{ item.path }}: {{ item.title }}</li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>
-    Alas, there are no cool things yet&hellip; but feel free to follow me on
-    <a href="https://github.com/oscarpalmer" target="_blank">GitHub</a> or
-    <a href="https://twitter.com/ohpalmer" target="_blank">Twitter</a>.<span aria-hidden="true">&nbsp;✌️</span>
-  </p>
-{% endif %}
+<h1>Packages</h1>
+
+{% for pkg in generated.packages.all %}
+	<article class="oui-card stack stack--text">
+		<h2><a href="{{ pkg.name.slug }}">{{ pkg.json.name }}</a></h2>
+		<p>{{ pkg.json.description }}</p>
+		<span class="flex-as--fs oui-tag version">{{ pkg.json.version }}</span>
+	</article>
+{% endfor %}

@@ -1,0 +1,13 @@
+---
+pagination:
+  data: generated.items.groups
+  size: 1
+  alias: paginated
+layout: default
+permalink: /{{ paginated.package.slug }}/{{ paginated.export.slug }}/{{ paginated.type.plural }}/index.html
+---
+<h1>{{ paginated.export.original }}, {{ paginated.type.plural }}</h1>
+
+{% render 'links.liquid',
+  items: generated[paginated.package.original][paginated.export.original][paginated.type.plural].array
+%}

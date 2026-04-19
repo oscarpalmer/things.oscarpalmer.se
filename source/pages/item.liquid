@@ -1,0 +1,25 @@
+---
+pagination:
+  data: generated.items.multiple
+  size: 1
+  alias: paginated
+layout: default
+permalink: /{{ paginated.package.slug }}/{{ paginated.export.slug }}/{{ paginated.type.plural }}/{{ paginated.name.slug }}/index.html
+---
+<h1>{{ paginated.name.original }}</h1>
+
+{% if paginated.type.singular == 'class' %}
+  {% assign item = generated[paginated.package.original][paginated.export.original].classes.map[paginated.name.original] %}
+  {% for type in generated.classes.types %}
+    {% assign label = type.plural | capitalize %}
+    {% render 'details.liquid', items: item[type.plural].array, label: label %}
+  {% endfor %}
+{% else %}
+  {% assign item = generated[paginated.package.original][paginated.export.original][paginated.type.plural].map[paginated.name.original] %}
+
+  {% if paginated.type.singular == 'function' %}
+    {% render 'function.liquid', item: item, page: page %}
+  {% elsif paginated.type.singular == 'model' %}
+    {% render 'model.liquid', item: item, page: page %}
+  {% endif %}
+{% endif %}

@@ -1,0 +1,13 @@
+{% if items.length > 0 %}
+  <div class="details">
+    <details class="oui-details" open>
+      <summary>{{ label }}</summary>
+
+      {% render 'links.liquid', items: items, prefix: prefix %}
+    </details>
+
+    <p class="details__link">
+      <a href="{{ items[0] | groupUrl }}">&rarr;&nbsp;{{ label }}</a>
+    </p>
+  </div>
+{% endif %}

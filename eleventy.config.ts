@@ -1,4 +1,6 @@
 import {minify as minifyHtml} from 'html-minifier';
+import {getTitle} from './.11ty/codes.ts';
+import {getBreadcrumbs, getCode, getGroupUrl, renderMarkdown} from './.11ty/filters.ts';
 
 const environment = {
 	production: (process.env.ELEVENTY_RUN_MODE || 'development') === 'build',
@@ -18,7 +20,7 @@ const options = {
 	},
 };
 
-export default (config) => {
+export default config => {
 	config.addGlobalData(
 		'canonicalUrl',
 		environment.production ? 'https://things.oscarpalmer.se' : 'http://localhost:4567',
@@ -33,6 +35,13 @@ export default (config) => {
 
 	config.addGlobalData('version', process.env.ELEVENTY_VERSION || '???');
 
+	config.addFilter('breadcrumbs', getBreadcrumbs);
+	config.addFilter('code', getCode);
+	config.addFilter('groupUrl', getGroupUrl);
+	config.addFilter('markdown', renderMarkdown);
+
+	config.addShortcode('getTitle', getTitle);
+
 	config.addPassthroughCopy({
 		'source/assets/images': 'assets/images',
 		'source/assets/javascript': 'assets/javascript',
@@ -45,9 +54,7 @@ export default (config) => {
 
 	if (environment.production) {
 		config.addTransform('html', (content, path) => {
-			return path.endsWith('.html')
-				? minifyHtml(content, options.html)
-				: content;
+			return path.endsWith('.html') ? minifyHtml(content, options.html) : content;
 		});
 	}
 

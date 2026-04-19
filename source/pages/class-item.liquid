@@ -1,0 +1,13 @@
+---
+pagination:
+  data: generated.classes.all
+  size: 1
+  alias: paginated
+layout: default
+permalink: /{{ paginated.package.slug }}/{{ paginated.export.slug }}/classes/{{ paginated.class.name.slug }}/{{ paginated.type.plural }}/{{ paginated.name.slug }}/index.html
+---
+<h1>{{ paginated.name.original }}</h1>
+
+{% render 'links.liquid',
+  items: generated[paginated.package.original][paginated.export.original].classes.map[paginated.name.original][paginated.type.plural]
+%}

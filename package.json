@@ -12,7 +12,7 @@
 	},
 	"type": "module",
 	"scripts": {
-		"build": "rm -rf ./build && npm run css:build && eleventy",
+		"build": "node ./.typedoc/index.ts && npm run css:build && eleventy",
 		"css:build": "sass ./source/assets/stylesheets/styles.scss ./build/assets/stylesheets/styles.css --style=compressed --no-source-map --quiet",
 		"css:watch": "sass ./source/assets/stylesheets/styles.scss ./build/assets/stylesheets/styles.css --quiet --watch",
 		"serve": "rm -rf ./build && concurrently \"npm run css:watch\" \"eleventy --quiet --serve\""
@@ -20,13 +20,21 @@
 	"devDependencies": {
 		"@11ty/eleventy": "^4.0.0-alpha.7",
 		"@oscarpalmer/atoms": "^0.179",
+		"@oscarpalmer/jhunal": "^0.27",
+		"@oscarpalmer/mora": "^0.28",
 		"@oscarpalmer/oui": "^0.20",
+		"@oscarpalmer/toretto": "^0.42",
+		"@oscarpalmer/timer": "^0.42",
 		"@oxlint/plugins": "^1.60",
+		"@types/markdown-it": "^14.1",
 		"@types/node": "^25.6",
 		"concurrently": "^9.2",
 		"html-minifier": "^4",
 		"markdown-it": "^14.1",
+		"pkg-types": "^2.3",
 		"sass": "^1.99",
+		"shiki": "^4",
+		"typedoc": "^0.28",
 		"typescript": "^5.9",
 		"vite": "npm:@voidzero-dev/vite-plus-core@latest",
 		"vite-plus": "latest"

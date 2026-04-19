@@ -1,0 +1,16 @@
+---
+pagination:
+  data: generated.exports.multiple
+  size: 1
+  alias: paginated
+layout: default
+permalink: /{{ paginated.package.slug }}/{{ paginated.export.slug }}/index.html
+---
+{% assign pkg = generated[paginated.package.original][paginated.export.original] %}
+
+<h1>{{ paginated.export.original }}</h1>
+
+{% for type in generated.items.types %}
+  {% assign label = type.plural | capitalize %}
+  {% render 'details.liquid', items: pkg[type.plural].array, label: label %}
+{% endfor %}

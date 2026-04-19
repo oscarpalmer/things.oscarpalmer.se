@@ -17,15 +17,16 @@
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitOverride": true,
 		// "noUncheckedIndexedAccess": true,
-		"outDir": "./dist",
+		"outDir": "./",
 		"resolveJsonModule": true,
-		"rootDir": "./src",
+		"rootDir": "./",
 		"skipLibCheck": true,
 		"strict": true,
 		"target": "esnext",
+		"types": ["node"],
 		"useDefineForClassFields": true,
 		"verbatimModuleSyntax": true
 	},
-	"exclude": ["dist", "node_modules", "test", "types", "www"],
-	"include": ["src/**/*.ts"]
+	"exclude": [],
+	"include": ["./.11ty/*.ts", "./.typedoc/*.ts", "./node_modules/@oscarpalmer/**/*.ts"]
 }

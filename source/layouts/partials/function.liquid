@@ -1,0 +1,10 @@
+{% for signature in item.declaration.signatures %}
+  <article class="stack">
+    <div>
+      {{ signature.comment.summary | markdown }}
+    </div>
+    <div>
+			{{ signature.code.items | last | code: page.url }}
+		</div>
+  </article>
+{% endfor %}

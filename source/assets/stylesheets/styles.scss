@@ -1,5 +1,9 @@
 @use '../../../node_modules/@oscarpalmer/oui/src/css/reset.scss';
+@use '../../../node_modules/@oscarpalmer/oui/src/css/badge.scss';
+@use '../../../node_modules/@oscarpalmer/oui/src/css/color.scss';
+@use '../../../node_modules/@oscarpalmer/oui/src/css/content.scss';
 @use '../../../node_modules/@oscarpalmer/oui/src/css/flex.scss';
+@use '../../../node_modules/@oscarpalmer/oui/src/css/form.scss';
 
 body {
 	display: flex;
@@ -25,4 +29,26 @@ body {
 
 .main {
 	background-color: #f7f7f7;
+}
+
+.shiki {
+	padding: 1rem;
+	border-radius: .25rem;
+}
+
+.details {
+	position: relative;
+
+	&__link {
+		font-size: .75rem;
+		position: absolute;
+		top: 0;
+		right: 0;
+	}
+}
+
+.version {
+	font-size: .75rem;
+	font-weight: normal;
+	font-variant-numeric: tabular-nums;
 }
