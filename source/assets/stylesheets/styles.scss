@@ -1,10 +1,12 @@
 @use '../../../node_modules/@oscarpalmer/oui/src/css/reset.scss';
 @use '../../../node_modules/@oscarpalmer/oui/src/css/a11y.scss';
 @use '../../../node_modules/@oscarpalmer/oui/src/css/badge.scss';
+@use '../../../node_modules/@oscarpalmer/oui/src/css/button.scss';
 @use '../../../node_modules/@oscarpalmer/oui/src/css/color.scss';
 @use '../../../node_modules/@oscarpalmer/oui/src/css/content.scss';
 @use '../../../node_modules/@oscarpalmer/oui/src/css/flex.scss';
 @use '../../../node_modules/@oscarpalmer/oui/src/css/form.scss';
+@use '../../../node_modules/@oscarpalmer/oui/src/css/popover.scss';
 
 body {
 	display: flex;
@@ -14,7 +16,11 @@ body {
 
 code,
 pre {
-	font-size: .875rem;
+	font-size: 0.875rem;
+}
+
+hr {
+	border-color: #ddd;
 }
 
 .header,
@@ -29,7 +35,7 @@ pre {
 
 .footer {
 	border-top: 1px solid #ddd;
-	font-size: .875rem;
+	font-size: 0.875rem;
 	font-style: italic;
 }
 
@@ -39,7 +45,7 @@ pre {
 
 .shiki {
 	padding: 1rem;
-	border-radius: .25rem;
+	border-radius: 0.25rem;
 	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.0625);
 }
 
@@ -47,15 +53,47 @@ pre {
 	position: relative;
 
 	&__link {
-		font-size: .75rem;
+		font-size: 0.75rem;
 		position: absolute;
 		top: 0;
 		right: 0;
 	}
 }
 
+.search {
+	&__content {
+		padding: 0;
+	}
+
+	&__form {
+		padding: 1rem;
+	}
+
+	&__results {
+		&__message {
+			margin: 1rem;
+		}
+
+		&__list {
+			min-width: min(16rem, 10vw);
+			max-width: max(48rem, 50vw);
+			max-height: max(48rem, 50vh);
+			overflow: auto;
+
+			&__item {
+				padding: 1rem;
+				border-bottom: 1px solid #ddd;
+
+				&:last-child {
+					border-bottom: none;
+				}
+			}
+		}
+	}
+}
+
 .version {
-	font-size: .75rem;
+	font-size: 0.75rem;
 	font-weight: normal;
 	font-variant-numeric: tabular-nums;
 }

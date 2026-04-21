@@ -53,7 +53,7 @@ export default config => {
 
 	config.addPassthroughCopy({
 		'source/assets/images': 'assets/images',
-		'source/assets/javascript': 'assets/javascript',
+		'source/assets/javascript/data.js': 'assets/javascript/data.js',
 		'source/robots.txt': 'robots.txt',
 	});
 

@@ -1,4 +1,5 @@
 import {toRecord} from '@oscarpalmer/atoms/array/to-record';
+import abydonPackage from '@oscarpalmer/abydon/package.json' with {type: 'json'};
 import atomsPackage from '@oscarpalmer/atoms/package.json' with {type: 'json'};
 import {isNullableOrWhitespace} from '@oscarpalmer/atoms/is';
 import {getString} from '@oscarpalmer/atoms/string';
@@ -7,7 +8,7 @@ import moraPackage from '@oscarpalmer/mora/package.json' with {type: 'json'};
 import timerPackage from '@oscarpalmer/timer/package.json' with {type: 'json'};
 import torettoPackage from '@oscarpalmer/toretto/package.json' with {type: 'json'};
 import MarkdownIt from 'markdown-it';
-import {mkdir, writeFile} from 'node:fs/promises';
+import {copyFile, mkdir, writeFile} from 'node:fs/promises';
 import {
 	Application,
 	type DeclarationReflection,
@@ -241,6 +242,12 @@ const search: DataSearch[] = [];
 
 const mapped = [
 	{
+		items: getMapped(abydonPackage.exports),
+		name: 'abydon',
+		pkg: abydonPackage,
+		single: true,
+	},
+	{
 		items: getMapped(atomsPackage.exports),
 		name: 'atoms',
 		pkg: atomsPackage,
@@ -414,6 +421,7 @@ for (const map of mapped) {
 			search.push({
 				url,
 				name: item.name,
+				package: item.package,
 				values: [
 					...(item.declaration?.declaration.signatures?.map(sig =>
 						renderMarkdown(sig.comment?.summary?.map(sum => sum.text) ?? []).replace(
@@ -548,6 +556,7 @@ for (const map of mapped) {
 				search.push({
 					url,
 					name: item.name,
+					package: item.package,
 					values: [
 						...(item.declaration?.declaration.signatures?.map(sig =>
 							renderMarkdown(sig.comment?.summary?.map(sum => sum.text) ?? []).replace(
@@ -627,3 +636,5 @@ search.sort(compareItems);
 await writeFile('./data/generated/search.js', `export default ${JSON.stringify(search)};`, {
 	encoding: 'utf8',
 });
+
+await copyFile('./data/generated/search.js', './source/assets/javascript/data.js');

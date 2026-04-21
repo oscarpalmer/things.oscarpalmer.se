@@ -12,13 +12,16 @@
 	},
 	"type": "module",
 	"scripts": {
-		"build": "node ./.typedoc/index.ts && npm run css:build && eleventy",
+		"build": "node ./.typedoc/index.ts && npm run css:build && npm run tsdown:build && npx eleventy",
 		"css:build": "sass ./source/assets/stylesheets/styles.scss ./build/assets/stylesheets/styles.css --style=compressed --no-source-map --quiet",
 		"css:watch": "sass ./source/assets/stylesheets/styles.scss ./build/assets/stylesheets/styles.css --quiet --watch",
-		"serve": "rm -rf ./build && concurrently \"npm run css:watch\" \"eleventy --quiet --serve\""
+		"serve": "rm -rf ./build && concurrently \"npm run css:watch\" \"npm run tsdown:watch\" \"npx eleventy --quiet --serve\"",
+		"tsdown:build": "npx tsdown -c ./tsdown.config.ts",
+		"tsdown:watch": "npx tsdown -c ./tsdown.config.ts --watch"
 	},
 	"devDependencies": {
 		"@11ty/eleventy": "^4.0.0-alpha.7",
+		"@oscarpalmer/abydon": "^0.20",
 		"@oscarpalmer/atoms": "^0.179",
 		"@oscarpalmer/jhunal": "^0.27",
 		"@oscarpalmer/mora": "^0.28",
@@ -34,6 +37,7 @@
 		"pkg-types": "^2.3",
 		"sass": "^1.99",
 		"shiki": "^4",
+		"tsdown": "^0.21",
 		"typedoc": "^0.28",
 		"typescript": "^5.9",
 		"vite": "npm:@voidzero-dev/vite-plus-core@latest",

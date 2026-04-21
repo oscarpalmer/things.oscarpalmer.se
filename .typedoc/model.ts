@@ -135,6 +135,7 @@ export type DataPackage = {
 
 export type DataSearch = {
 	readonly name: DataName;
+	readonly package: DataName;
 	readonly url: string;
 	readonly values: string[];
 };
