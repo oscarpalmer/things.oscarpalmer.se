@@ -1,4 +1,5 @@
 @use '../../../node_modules/@oscarpalmer/oui/src/css/reset.scss';
+@use '../../../node_modules/@oscarpalmer/oui/src/css/a11y.scss';
 @use '../../../node_modules/@oscarpalmer/oui/src/css/badge.scss';
 @use '../../../node_modules/@oscarpalmer/oui/src/css/color.scss';
 @use '../../../node_modules/@oscarpalmer/oui/src/css/content.scss';
@@ -9,6 +10,11 @@ body {
 	display: flex;
 	flex-flow: column nowrap;
 	background-color: #fdfdfd;
+}
+
+code,
+pre {
+	font-size: .875rem;
 }
 
 .header,
@@ -34,6 +40,7 @@ body {
 .shiki {
 	padding: 1rem;
 	border-radius: .25rem;
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.0625);
 }
 
 .details {

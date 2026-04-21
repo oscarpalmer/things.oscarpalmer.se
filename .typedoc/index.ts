@@ -1,7 +1,9 @@
 import {toRecord} from '@oscarpalmer/atoms/array/to-record';
 import atomsPackage from '@oscarpalmer/atoms/package.json' with {type: 'json'};
-import {join} from '@oscarpalmer/atoms/string';
+import {isNullableOrWhitespace} from '@oscarpalmer/atoms/is';
+import {getString} from '@oscarpalmer/atoms/string';
 import jhunalPackage from '@oscarpalmer/jhunal/package.json' with {type: 'json'};
+import moraPackage from '@oscarpalmer/mora/package.json' with {type: 'json'};
 import timerPackage from '@oscarpalmer/timer/package.json' with {type: 'json'};
 import torettoPackage from '@oscarpalmer/toretto/package.json' with {type: 'json'};
 import MarkdownIt from 'markdown-it';
@@ -49,7 +51,7 @@ function getDeclarations(
 		return {
 			declaration,
 			name,
-			url: `${prefix}${getKinds(kind)}/${name.slug}`,
+			url: join([prefix, getKinds(kind), name.slug], '/'),
 		};
 	});
 
@@ -122,7 +124,7 @@ function getMapped(exports: Record<string, unknown>): DataMapped[] {
 	) as [string, {default: string}][];
 
 	if (entries.length === 1) {
-		return [mapper(entries[0][0], entries[0][1])!];
+		return [mapper('', entries[0][1])!];
 	}
 
 	return entries
@@ -149,6 +151,13 @@ function getPlural(type: DataItemTypeSingular): DataItemTypePlural {
 		default:
 			return `${type}s` as DataItemTypePlural;
 	}
+}
+
+function join(parts: unknown[], separator: string): string {
+	return parts
+		.map(getString)
+		.filter(part => !isNullableOrWhitespace(part))
+		.join(separator);
 }
 
 function getType(type: DataItemTypeSingular): DataItemType {
@@ -193,30 +202,37 @@ const all: Record<string, DataItem> = {};
 const generated: DataGenerated = {
 	classes: {
 		accessors: [],
-		all: [],
 		constructors: [],
-		groups: [],
+		groups: {
+			multi: [],
+			single: [],
+		},
 		methods: [],
+		multi: [],
 		properties: [],
+		single: [],
 		types: [getType('constructor'), getType('accessor'), getType('method'), getType('property')],
 	},
 	exports: {
-		multiple: [],
+		multi: [],
 		single: [],
 	},
 	items: {
 		classes: [],
 		functions: [],
-		groups: [],
+		groups: {
+			multi: [],
+			single: [],
+		},
 		models: [],
-		multiple: [],
+		multi: [],
 		single: [],
 		types: [getType('class'), getType('function'), getType('model'), getType('variable')],
 		variables: [],
 	},
 	packages: {
 		all: [],
-		multiple: [],
+		multi: [],
 		single: [],
 	},
 };
@@ -234,6 +250,12 @@ const mapped = [
 		items: getMapped(jhunalPackage.exports),
 		name: 'jhunal',
 		pkg: jhunalPackage,
+		single: true,
+	},
+	{
+		items: getMapped(moraPackage.exports),
+		name: 'mora',
+		pkg: moraPackage,
 		single: true,
 	},
 	{
@@ -301,7 +323,7 @@ for (const map of mapped) {
 			exportUrl = exp.url;
 		} else {
 			const exportName = getName(isSubExport ? parentSlug : name);
-			exportUrl = `/${pkg.name.slug}/${exportName.slug}/`;
+			exportUrl = `/${join([pkg.name.slug, exportName.slug], '/')}`;
 
 			exp = {
 				export: exportName,
@@ -316,7 +338,7 @@ for (const map of mapped) {
 			if (map.single) {
 				generated.exports.single.push(exp);
 			} else {
-				generated.exports.multiple.push(exp);
+				generated.exports.multi.push(exp);
 			}
 
 			parentExports.set(parentSlug, exp);
@@ -342,19 +364,19 @@ for (const map of mapped) {
 		const functions = data.functions.array.map(fn => ({
 			...getItem(types.function, exp, fn),
 			declaration: fn,
-			url: `${exportUrl}${types.function.plural}/${fn.name.slug}/`,
+			url: join([exportUrl, types.function.plural, fn.name.slug], '/'),
 		}));
 
 		const models = data.models.array.map(model => ({
 			...getItem(types.model, exp, model),
 			declaration: model,
-			url: `${exportUrl}${types.model.plural}/${model.name.slug}/`,
+			url: join([exportUrl, types.model.plural, model.name.slug], '/'),
 		}));
 
 		const variables = data.variables.array.map(variable => ({
 			...getItem(types.variable, exp, variable),
 			declaration: variable,
-			url: `${exportUrl}${types.variable.plural}/${variable.name.slug}/`,
+			url: join([exportUrl, types.variable.plural, variable.name.slug], '/'),
 		}));
 
 		const allItems: DataItem[] = [...functions, ...models, ...variables];
@@ -362,7 +384,7 @@ for (const map of mapped) {
 		if (map.single) {
 			generated.items.single.push(...allItems);
 		} else {
-			generated.items.multiple.push(...allItems);
+			generated.items.multi.push(...allItems);
 		}
 
 		generated.items.functions.push(...functions);
@@ -370,16 +392,22 @@ for (const map of mapped) {
 		generated.items.variables.push(...variables);
 
 		if (!isSubExport) {
-			generated.items.groups.push(
+			const groups = [
 				getGroup('class', pkg, exp),
 				getGroup('function', pkg, exp),
 				getGroup('model', pkg, exp),
 				getGroup('variable', pkg, exp),
-			);
+			];
+
+			if (map.single) {
+				generated.items.groups.single.push(...groups);
+			} else {
+				generated.items.groups.multi.push(...groups);
+			}
 		}
 
 		for (const item of allItems) {
-			const url = `${exportUrl}${item.type.plural}/${item.name.slug}/`;
+			const url = join([exportUrl, item.type.plural, item.name.slug], '/');
 
 			all[url] = item;
 
@@ -403,7 +431,7 @@ for (const map of mapped) {
 
 		for (const cls of classes) {
 			const className = getName(cls.name);
-			const classUrl = `${exportUrl}classes/${className.slug}/`;
+			const classUrl = join([exportUrl, 'classes', className.slug], '/');
 
 			const classItem = {
 				...getItem(types.class, exp, {
@@ -417,7 +445,7 @@ for (const map of mapped) {
 			if (map.single) {
 				generated.items.single.push(classItem);
 			} else {
-				generated.items.multiple.push(classItem);
+				generated.items.multi.push(classItem);
 			}
 
 			generated.items.classes.push(classItem);
@@ -443,25 +471,25 @@ for (const map of mapped) {
 			const accessorItems = accessors.array.map(accessor => ({
 				...getItem(types.accessor, exp, accessor),
 				class: classItem,
-				url: `${classUrl}${types.accessor.plural}/${accessor.name.slug}/`,
+				url: join([classUrl, types.accessor.plural, accessor.name.slug], '/'),
 			}));
 
 			const constructorItems = constructors.array.map(ctor => ({
 				...getItem(types.constructor, exp, ctor),
 				class: classItem,
-				url: `${classUrl}${types.constructor.plural}/${ctor.name.slug}/`,
+				url: join([classUrl, types.constructor.plural, ctor.name.slug], '/'),
 			}));
 
 			const methodItems = methods.array.map(method => ({
 				...getItem(types.method, exp, method),
 				class: classItem,
-				url: `${classUrl}${types.method.plural}/${method.name.slug}/`,
+				url: join([classUrl, types.method.plural, method.name.slug], '/'),
 			}));
 
 			const propertyItems = properties.array.map(property => ({
 				...getItem(types.property, exp, property),
 				class: classItem,
-				url: `${classUrl}${types.property.plural}/${property.name.slug}/`,
+				url: join([classUrl, types.property.plural, property.name.slug], '/'),
 			}));
 
 			generated.classes.accessors.push(...accessorItems);
@@ -469,14 +497,20 @@ for (const map of mapped) {
 			generated.classes.methods.push(...methodItems);
 			generated.classes.properties.push(...propertyItems);
 
-			generated.classes.all.push(
+			const classesItems = [
 				...accessorItems,
 				...constructorItems,
 				...methodItems,
 				...propertyItems,
-			);
+			];
 
-			generated.classes.groups.push(
+			if (map.single) {
+				generated.classes.single.push(...classesItems);
+			} else {
+				generated.classes.multi.push(...classesItems);
+			}
+
+			const groups = [
 				{
 					class: classItem,
 					...getGroup('accessor', pkg, exp),
@@ -493,12 +527,21 @@ for (const map of mapped) {
 					class: classItem,
 					...getGroup('property', pkg, exp),
 				},
-			);
+			];
+
+			if (map.single) {
+				generated.classes.groups.single.push(...groups);
+			} else {
+				generated.classes.groups.multi.push(...groups);
+			}
 
 			const allItems = [...accessorItems, ...constructorItems, ...methodItems, ...propertyItems];
 
 			for (const item of allItems) {
-				const url = `${exportUrl}classes/${className.slug}/${item.type.plural}/${item.name.slug}/`;
+				const url = join(
+					[exportUrl, 'classes', className.slug, item.type.plural, item.name.slug],
+					'/',
+				);
 
 				all[url] = item;
 
@@ -561,7 +604,7 @@ for (const map of mapped) {
 	if (map.single) {
 		generated.packages.single.push(pkg);
 	} else {
-		generated.packages.multiple.push(pkg);
+		generated.packages.multi.push(pkg);
 	}
 }
 

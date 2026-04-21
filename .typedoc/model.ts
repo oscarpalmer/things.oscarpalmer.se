@@ -38,33 +38,44 @@ export type DataGenerated = {
 
 export type DataGeneratedClasses = {
 	readonly accessors: DataClassItem[];
-	readonly all: DataClassItem[];
 	readonly constructors: DataClassItem[];
-	readonly groups: DataClassItem[];
+	readonly groups: DataGeneratedClassesGroups;
 	readonly methods: DataClassItem[];
+	readonly multi: DataClassItem[];
 	readonly properties: DataClassItem[];
+	readonly single: DataClassItem[];
 	readonly types: DataItemType[];
 };
 
+export type DataGeneratedClassesGroups = {
+	readonly multi: DataClassItem[];
+	readonly single: DataClassItem[];
+};
+
 export type DataGeneratedExports = {
-	readonly multiple: DataItem[];
+	readonly multi: DataItem[];
 	readonly single: DataItem[];
 };
 
 export type DataGeneratedItems = {
 	readonly classes: DataItem[];
 	readonly functions: DataItem[];
-	readonly groups: DataItem[];
+	readonly groups: DataGeneratedItemsGroups;
 	readonly models: DataItem[];
-	readonly multiple: DataItem[];
+	readonly multi: DataItem[];
 	readonly single: DataItem[];
 	readonly types: DataItemType[];
 	readonly variables: DataItem[];
 };
 
+export type DataGeneratedItemsGroups = {
+	readonly multi: DataItem[];
+	readonly single: DataItem[];
+};
+
 export type DataGeneratedPackages = {
 	readonly all: DataPackage[];
-	readonly multiple: DataPackage[];
+	readonly multi: DataPackage[];
 	readonly single: DataPackage[];
 };
 

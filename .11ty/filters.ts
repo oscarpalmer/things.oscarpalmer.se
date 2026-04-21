@@ -1,14 +1,15 @@
 import {join} from '@oscarpalmer/atoms/string';
 import MarkdownIt from 'markdown-it';
+import type {ParameterReflection, SignatureReflection} from 'typedoc';
+import type {DataItem} from '../.typedoc/model.ts';
 import {findCrumb, renderCode} from './helpers.ts';
-import type { DataItem } from '../.typedoc/model.ts';
 
 const md = new MarkdownIt({
 	html: true,
 });
 
-export async function getCode(code: string, url: string): Promise<string> {
-	return renderCode(code, url);
+export async function getCode(code: string): Promise<string> {
+	return renderCode(code);
 }
 
 export function getBreadcrumbs(url: string) {
@@ -25,7 +26,7 @@ export function getBreadcrumbs(url: string) {
 
 			return {
 				url,
-				label: item?.name.original ?? part,
+				label: item?.declaration?.name ?? item?.name.original ?? part,
 			};
 		}),
 	];
@@ -35,19 +36,35 @@ export function getGroupUrl(item: DataItem): string {
 	return item.url.replace(/\/\w+$/, '');
 }
 
+export function getReturns(signature: SignatureReflection): string {
+	const returns = signature.comment?.blockTags?.find(tag => tag.tag === '@returns');
+
+	return returns == null ? '' : renderMarkdown(returns.content);
+}
+
+export function getType(parameter: ParameterReflection): string {
+	if (parameter.type == null) {
+		return 'unknown';
+	}
+
+	if ((parameter.type as any).name != null) {
+		return (parameter.type as any).name;
+	}
+
+	return 'unknown';
+}
+
 export function renderMarkdown(value: unknown) {
 	return typeof value === 'string'
 		? md.render(value)
 		: Array.isArray(value)
-		? md.render(
-				join(
-					value
-						.map(part =>
-							typeof part === 'object' && 'text' in part ? part.text : part,
-						)
-						.filter(part => typeof part === 'string'),
-					'',
-				),
-		  )
-		: '';
+			? md.render(
+					join(
+						value
+							.map(part => (typeof part === 'object' && 'text' in part ? part.text : part))
+							.filter(part => typeof part === 'string'),
+						'',
+					),
+				)
+			: '';
 }

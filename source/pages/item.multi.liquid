@@ -1,6 +1,6 @@
 ---
 pagination:
-  data: generated.items.multiple
+  data: generated.items.multi
   size: 1
   alias: paginated
 layout: default
@@ -18,8 +18,8 @@ permalink: /{{ paginated.package.slug }}/{{ paginated.export.slug }}/{{ paginate
   {% assign item = generated[paginated.package.original][paginated.export.original][paginated.type.plural].map[paginated.name.original] %}
 
   {% if paginated.type.singular == 'function' %}
-    {% render 'function.liquid', item: item, page: page %}
+    {% render 'function.liquid', item: item, page: page, pkg: paginated.package.original %}
   {% elsif paginated.type.singular == 'model' %}
-    {% render 'model.liquid', item: item, page: page %}
+    {% render 'model.liquid', item: item, page: page, pkg: paginated.package.original %}
   {% endif %}
 {% endif %}

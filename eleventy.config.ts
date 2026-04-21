@@ -1,6 +1,13 @@
 import {minify as minifyHtml} from 'html-minifier';
 import {getTitle} from './.11ty/codes.ts';
-import {getBreadcrumbs, getCode, getGroupUrl, renderMarkdown} from './.11ty/filters.ts';
+import {
+	getBreadcrumbs,
+	getCode,
+	getGroupUrl,
+	getReturns,
+	getType,
+	renderMarkdown,
+} from './.11ty/filters.ts';
 
 const environment = {
 	production: (process.env.ELEVENTY_RUN_MODE || 'development') === 'build',
@@ -39,6 +46,8 @@ export default config => {
 	config.addFilter('code', getCode);
 	config.addFilter('groupUrl', getGroupUrl);
 	config.addFilter('markdown', renderMarkdown);
+	config.addFilter('returns', getReturns);
+	config.addFilter('type', getType);
 
 	config.addShortcode('getTitle', getTitle);
 

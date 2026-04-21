@@ -1,0 +1,15 @@
+---
+pagination:
+  data: generated.classes.multi
+  size: 1
+  alias: paginated
+layout: default
+permalink: /{{ paginated.package.slug }}/{{ paginated.export.slug }}/classes/{{ paginated.class.name.slug }}/{{ paginated.type.plural }}/{{ paginated.name.slug }}/index.html
+---
+<h1>{{ paginated.name.original }}</h1>
+
+{% assign item = generated[paginated.package.original][paginated.export.original].classes.map[paginated.class.name.original][paginated.type.plural].array
+  | first
+%}
+
+{% render 'function.liquid', item: item, page: page, pkg: paginated.package.original %}
