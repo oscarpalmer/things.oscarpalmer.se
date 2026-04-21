@@ -2,3 +2,5 @@ build/
 data/generated/**
 node_modules/
 source/assets/javascript/data.js
+
+!data/generated/all.js
