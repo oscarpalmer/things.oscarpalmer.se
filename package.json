@@ -1,6 +1,6 @@
 {
 	"name": "things.oscarpalmer.se",
-	"version": "26.4.21",
+	"version": "26.4.23",
 	"private": true,
 	"description": "Things I've made: utilities, demos, experiments, and other whatchamacallits.",
 	"homepage": "https://github.com/oscarpalmer/things.oscarpalmer.se",
@@ -12,7 +12,7 @@
 	},
 	"type": "module",
 	"scripts": {
-		"build": "node ./.typedoc/index.ts && npm run css:build && npm run tsdown:build && npx eleventy",
+		"build": "tsx ./.typedoc/index.ts && npm run css:build && npm run tsdown:build && tsx ./node_modules/@11ty/eleventy/cmd.cjs",
 		"css:build": "sass ./source/assets/stylesheets/styles.scss ./build/assets/stylesheets/styles.css --style=compressed --no-source-map --quiet",
 		"css:watch": "sass ./source/assets/stylesheets/styles.scss ./build/assets/stylesheets/styles.css --quiet --watch",
 		"serve": "rm -rf ./build && concurrently \"npm run css:watch\" \"npm run tsdown:watch\" \"npx eleventy --quiet --serve\"",
@@ -28,7 +28,7 @@
 		"@oscarpalmer/oui": "^0.20",
 		"@oscarpalmer/toretto": "^0.42",
 		"@oscarpalmer/timer": "^0.42",
-		"@oxlint/plugins": "^1.60",
+		"@oxlint/plugins": "^1.61",
 		"@types/markdown-it": "^14.1",
 		"@types/node": "^25.6",
 		"concurrently": "^9.2",
@@ -38,6 +38,7 @@
 		"sass": "^1.99",
 		"shiki": "^4",
 		"tsdown": "^0.21",
+		"tsx": "^4.21",
 		"typedoc": "^0.28",
 		"typescript": "^5.9",
 		"vite": "npm:@voidzero-dev/vite-plus-core@latest",
