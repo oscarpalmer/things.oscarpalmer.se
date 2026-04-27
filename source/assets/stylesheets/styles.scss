@@ -23,6 +23,10 @@ hr {
 	border-color: #ddd;
 }
 
+svg {
+	width: 1em;
+}
+
 .header,
 .footer,
 .main {
@@ -31,6 +35,10 @@ hr {
 
 .header {
 	border-bottom: 1px solid #ddd;
+
+	&__navigation {
+		min-height: 2rem;
+	}
 }
 
 .footer {
@@ -39,6 +47,13 @@ hr {
 	font-style: italic;
 }
 
+.breadcrumbs {
+	padding: .5rem;
+	border-bottom: 1px solid #ddd;
+	font-size: .75rem;
+}
+
+.breadcrumbs,
 .main {
 	background-color: #f7f7f7;
 }

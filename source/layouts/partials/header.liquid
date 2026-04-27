@@ -1,8 +1,16 @@
 <header class="stack stack-small header" role="banner">
   <p><b>{{ meta.title }}</b><p>
   <p>{{ meta.description }}</p>
-	<nav class="flow flex-jc--sb" role="navigation">
-		{% render 'breadcrumbs.liquid', breadcrumbs: breadcrumbs %}
+	<nav class="flow flow--small flex-ai--fe flex-jc--sb header__navigation" role="navigation">
+		<ul class="flow flow--small">
+			{% for pkg in generated.packages.all %}
+				<li><a href="{{ pkg.name.slug }}">{{ pkg.name.slug }}</a></li>
+			{% endfor %}
+		</ul>
 		<div id="search"></div>
 	</nav>
 </header>
+
+<nav class="breadcrumbs">
+	{% render 'breadcrumbs.liquid', breadcrumbs: breadcrumbs %}
+</nav>
