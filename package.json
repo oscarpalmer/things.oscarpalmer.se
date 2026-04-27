@@ -1,6 +1,6 @@
 {
 	"name": "things.oscarpalmer.se",
-	"version": "26.4.23",
+	"version": "26.4.27",
 	"private": true,
 	"description": "Things I've made: utilities, demos, experiments, and other whatchamacallits.",
 	"homepage": "https://github.com/oscarpalmer/things.oscarpalmer.se",
@@ -21,8 +21,8 @@
 	},
 	"devDependencies": {
 		"@11ty/eleventy": "^4.0.0-alpha.7",
-		"@oscarpalmer/abydon": "^0.20",
-		"@oscarpalmer/atoms": "^0.179",
+		"@oscarpalmer/abydon": "^0.21",
+		"@oscarpalmer/atoms": "^0.184",
 		"@oscarpalmer/jhunal": "^0.27",
 		"@oscarpalmer/mora": "^0.28",
 		"@oscarpalmer/oui": "^0.20",
