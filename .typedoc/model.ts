@@ -134,6 +134,7 @@ export type DataPackage = {
 };
 
 export type DataSearch = {
+	readonly class?: DataName;
 	readonly name: DataName;
 	readonly package: DataName;
 	readonly url: string;
@@ -142,9 +143,7 @@ export type DataSearch = {
 
 export type DataSimpleDeclaration = {
 	code?: unknown[];
-	declaration: {
-		signatures?: DeclarationReflection['signatures'];
-	};
+	declaration: Partial<DeclarationReflection>;
 	name: DataName;
 	url: string;
 };

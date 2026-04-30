@@ -11,13 +11,13 @@ export default {
       label: 'Abydon',
       url: 'https://github.com/oscarpalmer/abydon',
     },
-    atoms: {
-      label: 'Atoms',
-      url: 'https://github.com/oscarpalmer/atoms',
-    },
     suffix: {
       label: 'much more',
       url: 'https://github.com/oscarpalmer/things.oscarpalmer.se',
+    },
+    typedoc: {
+      label: 'TypeDoc',
+      url: 'https://typedoc.org',
     },
   },
 };

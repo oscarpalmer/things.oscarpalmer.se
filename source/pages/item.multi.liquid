@@ -18,8 +18,8 @@ permalink: /{{ paginated.package.slug }}/{{ paginated.export.slug }}/{{ paginate
   {% assign item = generated[paginated.package.original][paginated.export.original][paginated.type.plural].map[paginated.name.original] %}
 
   {% if paginated.type.singular == 'function' %}
-    {% render 'function.liquid', item: item, page: page, pkg: paginated.package.original %}
+    {% render 'callable.liquid', item: item, page: page, paginated: paginated %}
   {% elsif paginated.type.singular == 'model' %}
-    {% render 'model.liquid', item: item, page: page, pkg: paginated.package.original %}
+    {% render 'model.liquid', item: item, page: page, paginated: paginated %}
   {% endif %}
 {% endif %}

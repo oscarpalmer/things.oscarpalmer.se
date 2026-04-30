@@ -1,3 +1,5 @@
+import {dedent} from '@oscarpalmer/atoms/string';
+import {endsWith, includes} from '@oscarpalmer/atoms/string/match';
 import {codeToHtml} from 'shiki';
 import type {DataItem} from '../.typedoc/model.ts';
 import data from '../data/generated/all.js';
@@ -11,14 +13,12 @@ function findDataItem(needle: unknown): DataItem | undefined {
 		return;
 	}
 
-	const normalized = needle.includes('/')
-		? needle.toLowerCase().replace(/\/$/, '')
-		: `/${needle.toLowerCase()}`;
+	const normalized = `/${needle.toLowerCase().replace(/^\/|\/$/g, '')}/`;
 
-	const keys = Object.keys(data as Record<string, any>).filter(key => key.includes(normalized));
+	const keys = Object.keys(data as Record<string, any>).filter(key => includes(key, normalized));
 
 	for (const key of keys) {
-		if (key === normalized || key.endsWith(normalized)) {
+		if (key === normalized || endsWith(key, normalized)) {
 			const item = (data as Record<string, any>)[key] as DataItem;
 
 			if (item != null) {
@@ -33,7 +33,7 @@ export function findItem(needle: unknown): DataItem | undefined {
 }
 
 export async function renderCode(code: string): Promise<string> {
-	return codeToHtml(code, {
+	return codeToHtml(/^\s/.test(code) ? dedent(code) : code, {
 		lang: 'typescript',
 		themes: {
 			dark: 'github-dark',

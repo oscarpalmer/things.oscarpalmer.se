@@ -8,8 +8,7 @@ permalink: /{{ paginated.package.slug }}/classes/{{ paginated.class.name.slug }}
 ---
 <h1>{{ paginated.name.original }}</h1>
 
-{% assign item = generated[paginated.package.original].classes.map[paginated.class.name.original][paginated.type.plural].array
-  | first
+{% assign item = generated[paginated.package.original].classes.map[paginated.class.name.original][paginated.type.plural].map[paginated.name.original]
 %}
 
-{% render 'function.liquid', item: item, page: page, pkg: paginated.package.original %}
+{% render 'callable.liquid', item: item, page: page, paginated: paginated %}

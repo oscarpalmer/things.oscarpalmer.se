@@ -21,7 +21,7 @@ export function getBreadcrumbs(url: string) {
 			url: '/',
 		},
 		...parts.map((part, index) => {
-			const url = `/${join(parts.slice(0, index + 1), '/')}/`;
+			const url = `/${join(parts.slice(0, index + 1), '/').replace(/^\/|\/$/g, '')}/`;
 			const item = findCrumb(url);
 
 			return {
@@ -40,6 +40,17 @@ export function getReturns(signature: SignatureReflection): string {
 	const returns = signature.comment?.blockTags?.find(tag => tag.tag === '@returns');
 
 	return returns == null ? '' : renderMarkdown(returns.content);
+}
+
+export function getSourceUrl(signature: SignatureReflection, item: DataItem): string {
+	const source = signature.sources![0];
+
+	const filename = source.fullFileName.replace(
+		new RegExp(`^.+@oscarpalmer/${item.package.original}/src/`),
+		'',
+	);
+
+	return `<p><a href="https://github.com/oscarpalmer/${item.package.original}/blob/main/src/${filename}#L${source.line}">Source</a></p>`;
 }
 
 export function getType(parameter: ParameterReflection): string {

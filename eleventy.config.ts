@@ -5,15 +5,14 @@ import {
 	getCode,
 	getGroupUrl,
 	getReturns,
+	getSourceUrl,
 	getType,
 	renderMarkdown,
 } from './.11ty/filters.ts';
 
-const environment = {
-	production: (process.env.ELEVENTY_RUN_MODE || 'development') === 'build',
-};
+const timestamp = Number.parseInt(process.env.TIMESTAMP, 10);
 
-const now = new Date();
+const watch = process.argv.includes('--watch');
 
 const options = {
 	browser: {
@@ -30,15 +29,17 @@ const options = {
 export default config => {
 	config.addGlobalData(
 		'canonicalUrl',
-		environment.production ? 'https://things.oscarpalmer.se' : 'http://localhost:4567',
+		watch ? 'http://localhost:4567' : 'https://things.oscarpalmer.se',
 	);
 
-	config.addGlobalData('production', environment.production);
+	config.addGlobalData('production', !watch);
 
 	config.addGlobalData('timestamp', {
-		iso: now.toISOString(),
-		unix: now.getTime(),
+		iso: new Date(timestamp).toISOString(),
+		unix: timestamp,
 	});
+
+	console.log(timestamp, new Date(timestamp).toISOString());
 
 	config.addGlobalData('version', process.env.ELEVENTY_VERSION || '???');
 
@@ -47,13 +48,13 @@ export default config => {
 	config.addFilter('groupUrl', getGroupUrl);
 	config.addFilter('markdown', renderMarkdown);
 	config.addFilter('returns', getReturns);
+	config.addFilter('sourceUrl', getSourceUrl);
 	config.addFilter('type', getType);
 
 	config.addShortcode('getTitle', getTitle);
 
 	config.addPassthroughCopy({
 		'source/assets/images': 'assets/images',
-		'source/assets/javascript/data.js': 'assets/javascript/data.js',
 		'source/robots.txt': 'robots.txt',
 	});
 
@@ -61,11 +62,15 @@ export default config => {
 
 	config.setServerOptions(options.browser);
 
-	if (environment.production) {
-		config.addTransform('html', (content, path) => {
-			return path.endsWith('.html') ? minifyHtml(content, options.html) : content;
-		});
-	}
+	config.addTransform('html', (content, path) => {
+		if (watch || !path.endsWith('.html')) {
+			return content;
+		}
+
+		return minifyHtml(content, options.html);
+	});
+
+	config.setQuietMode(true);
 
 	return {
 		dir: {

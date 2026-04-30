@@ -1,3 +1,4 @@
+import {partition, select} from '@oscarpalmer/atoms/array';
 import {toRecord} from '@oscarpalmer/atoms/array/to-record';
 import abydonPackage from '@oscarpalmer/abydon/package.json' with {type: 'json'};
 import atomsPackage from '@oscarpalmer/atoms/package.json' with {type: 'json'};
@@ -42,23 +43,38 @@ function compareItems(
 }
 
 function getDeclarations(
+	module: string,
 	kind: ReflectionKind,
 	owner: DeclarationReflection | ProjectReflection,
 	prefix: string,
 ): DataValues<DataSimpleDeclaration> {
-	const array = owner.getChildrenByKind(kind).map(declaration => {
-		const name = getName(declaration.name);
+	const declarations = select(
+		owner.getChildrenByKind(kind),
+		declaration => {
+			const {fullFileName} = declaration.sources![0];
 
-		return {
-			declaration,
-			name,
-			url: join([prefix, getKinds(kind), name.slug], '/'),
-		};
-	});
+			if (!fullFileName.includes(module)) {
+				return false;
+			}
+
+			return !/node_modules\/.*?\/node_modules/.test(fullFileName);
+		},
+		declaration => {
+			const name = getName(declaration.name);
+
+			let signatures = declaration.signatures;
+
+			return {
+				declaration,
+				name,
+				url: getUrl([prefix, getKinds(kind), name.slug]),
+			};
+		},
+	);
 
 	return {
-		array,
-		map: toRecord(array, item => item.name.original),
+		array: declarations,
+		map: toRecord(declarations, item => item.name.original),
 	};
 }
 
@@ -152,6 +168,12 @@ function getPlural(type: DataItemTypeSingular): DataItemTypePlural {
 		default:
 			return `${type}s` as DataItemTypePlural;
 	}
+}
+
+function getUrl(parts: unknown[]): string {
+	return `/${join(parts, '/')
+		.replace(/\/+/g, '/')
+		.replace(/^\/|\/$/g, '')}/`;
 }
 
 function join(parts: unknown[], separator: string): string {
@@ -294,6 +316,10 @@ const types = {
 };
 
 for (const map of mapped) {
+	const module = `@oscarpalmer/${map.name}`;
+
+	console.log(` - Generating data for ${module}`);
+
 	const pkg: DataPackage = {
 		exports: [],
 		name: getName(map.name),
@@ -304,10 +330,13 @@ for (const map of mapped) {
 	const parentDataBlobs = new Map<string, DataBlob>();
 
 	for (const item of map.items) {
+		console.log(`   - Generating data for ${module}/${item.path}`);
+
 		await mkdir(`./data/generated/${map.name}/${item.name}`, {recursive: true});
 
 		const typedoc = await Application.bootstrapWithPlugins({
 			entryPoints: [`./node_modules/@oscarpalmer/${map.name}/src/${item.path}.ts`],
+			logLevel: 'Error',
 			plugin: [plugin],
 			tsconfig: './tsconfig.json',
 		});
@@ -315,22 +344,29 @@ for (const map of mapped) {
 		const project = await typedoc.convert();
 
 		if (project == null) {
+			console.log('   × Failed to generate typedoc-data');
+
 			continue;
 		}
+
+		console.log('     ✓ Generated typedoc-data');
 
 		const name = item.name.replace(/^\.\//, '');
 		const parentSlug = name.split('/')[0];
 		const isSubExport = name !== parentSlug;
 
 		let exp: DataItem;
+		let exportName: DataName;
 		let exportUrl: string;
 
 		if (isSubExport && parentExports.has(parentSlug)) {
 			exp = parentExports.get(parentSlug)!;
+
+			exportName = exp.name;
 			exportUrl = exp.url;
 		} else {
-			const exportName = getName(isSubExport ? parentSlug : name);
-			exportUrl = `/${join([pkg.name.slug, exportName.slug], '/')}`;
+			exportName = getName(isSubExport ? parentSlug : name);
+			exportUrl = getUrl([pkg.name.slug, exportName.slug]);
 
 			exp = {
 				export: exportName,
@@ -339,7 +375,29 @@ for (const map of mapped) {
 				type: types.export,
 				url: exportUrl,
 			};
+		}
 
+		const data: DataBlob = {
+			classes: {
+				array: [],
+				map: {},
+			},
+			functions: getDeclarations(module, ReflectionKind.Function, project, exportUrl),
+			models: getDeclarations(module, ReflectionKind.SomeType, project, exportUrl),
+			variables: getDeclarations(module, ReflectionKind.Variable, project, exportUrl),
+		};
+
+		if (
+			data.functions.array.length === 0 &&
+			data.models.array.length === 0 &&
+			data.variables.array.length === 0
+		) {
+			console.log('   × No declarations found');
+
+			continue;
+		}
+
+		if (!(isSubExport && parentExports.has(parentSlug))) {
 			pkg.exports.push(exp);
 
 			if (map.single) {
@@ -358,32 +416,30 @@ for (const map of mapped) {
 			});
 		}
 
-		const data: DataBlob = {
-			classes: {
-				array: [],
-				map: {},
-			},
-			functions: getDeclarations(ReflectionKind.Function, project, exportUrl),
-			models: getDeclarations(ReflectionKind.SomeType, project, exportUrl),
-			variables: getDeclarations(ReflectionKind.Variable, project, exportUrl),
-		};
+		console.log('     ✓ Generated base declarations');
 
 		const functions = data.functions.array.map(fn => ({
 			...getItem(types.function, exp, fn),
 			declaration: fn,
-			url: join([exportUrl, types.function.plural, fn.name.slug], '/'),
+			url: getUrl([exportUrl, types.function.plural, fn.name.slug]),
 		}));
 
-		const models = data.models.array.map(model => ({
-			...getItem(types.model, exp, model),
-			declaration: model,
-			url: join([exportUrl, types.model.plural, model.name.slug], '/'),
-		}));
+		const [models, modelClasses] = partition(
+			data.models.array.map(model => ({
+				...getItem(types.model, exp, model),
+				declaration: model,
+				url: getUrl([exportUrl, types.model.plural, model.name.slug]),
+			})),
+			item => item.declaration.declaration.kind !== ReflectionKind.Interface,
+		);
+
+		data.models.array = models.map(model => model.declaration);
+		data.models.map = toRecord(data.models.array, item => item.name.original);
 
 		const variables = data.variables.array.map(variable => ({
 			...getItem(types.variable, exp, variable),
 			declaration: variable,
-			url: join([exportUrl, types.variable.plural, variable.name.slug], '/'),
+			url: getUrl([exportUrl, types.variable.plural, variable.name.slug]),
 		}));
 
 		const allItems: DataItem[] = [...functions, ...models, ...variables];
@@ -414,7 +470,7 @@ for (const map of mapped) {
 		}
 
 		for (const item of allItems) {
-			const url = join([exportUrl, item.type.plural, item.name.slug], '/');
+			const url = getUrl([exportUrl, item.type.plural, item.name.slug]);
 
 			all[url] = item;
 
@@ -435,11 +491,16 @@ for (const map of mapped) {
 			item.declaration = undefined;
 		}
 
-		const classes = project.getChildrenByKind(ReflectionKind.Class);
+		console.log('     ✓ Generated declaration items');
+
+		const classes = [
+			...(modelClasses.map(cls => cls.declaration.declaration) as DeclarationReflection[]),
+			...project.getChildrenByKind(ReflectionKind.Class),
+		];
 
 		for (const cls of classes) {
 			const className = getName(cls.name);
-			const classUrl = join([exportUrl, 'classes', className.slug], '/');
+			const classUrl = getUrl([exportUrl, 'classes', className.slug]);
 
 			const classItem = {
 				...getItem(types.class, exp, {
@@ -447,6 +508,20 @@ for (const map of mapped) {
 				}),
 				url: classUrl,
 			};
+
+			const accessors = getDeclarations(module, ReflectionKind.Accessor, cls, classUrl);
+			const constructors = getDeclarations(module, ReflectionKind.Constructor, cls, classUrl);
+			const methods = getDeclarations(module, ReflectionKind.Method, cls, classUrl);
+			const properties = getDeclarations(module, ReflectionKind.Property, cls, classUrl);
+
+			if (
+				accessors.array.length === 0 &&
+				constructors.array.length === 0 &&
+				methods.array.length === 0 &&
+				properties.array.length === 0
+			) {
+				continue;
+			}
 
 			data.classes.array.push(classItem);
 
@@ -460,14 +535,6 @@ for (const map of mapped) {
 
 			all[classUrl] = classItem;
 
-			const accessors = getDeclarations(ReflectionKind.Accessor, cls, classUrl);
-
-			const constructors = getDeclarations(ReflectionKind.Constructor, cls, classUrl);
-
-			const methods = getDeclarations(ReflectionKind.Method, cls, classUrl);
-
-			const properties = getDeclarations(ReflectionKind.Property, cls, classUrl);
-
 			data.classes.map[cls.name] = {
 				accessors,
 				constructors,
@@ -479,25 +546,25 @@ for (const map of mapped) {
 			const accessorItems = accessors.array.map(accessor => ({
 				...getItem(types.accessor, exp, accessor),
 				class: classItem,
-				url: join([classUrl, types.accessor.plural, accessor.name.slug], '/'),
+				url: getUrl([classUrl, types.accessor.plural, accessor.name.slug]),
 			}));
 
 			const constructorItems = constructors.array.map(ctor => ({
 				...getItem(types.constructor, exp, ctor),
 				class: classItem,
-				url: join([classUrl, types.constructor.plural, ctor.name.slug], '/'),
+				url: getUrl([classUrl, types.constructor.plural, ctor.name.slug]),
 			}));
 
 			const methodItems = methods.array.map(method => ({
 				...getItem(types.method, exp, method),
 				class: classItem,
-				url: join([classUrl, types.method.plural, method.name.slug], '/'),
+				url: getUrl([classUrl, types.method.plural, method.name.slug]),
 			}));
 
 			const propertyItems = properties.array.map(property => ({
 				...getItem(types.property, exp, property),
 				class: classItem,
-				url: join([classUrl, types.property.plural, property.name.slug], '/'),
+				url: getUrl([classUrl, types.property.plural, property.name.slug]),
 			}));
 
 			generated.classes.accessors.push(...accessorItems);
@@ -546,15 +613,19 @@ for (const map of mapped) {
 			const allItems = [...accessorItems, ...constructorItems, ...methodItems, ...propertyItems];
 
 			for (const item of allItems) {
-				const url = join(
-					[exportUrl, 'classes', className.slug, item.type.plural, item.name.slug],
-					'/',
-				);
+				const url = getUrl([
+					exportUrl,
+					'classes',
+					className.slug,
+					item.type.plural,
+					item.name.slug,
+				]);
 
 				all[url] = item;
 
 				search.push({
 					url,
+					class: classItem.name,
 					name: item.name,
 					package: item.package,
 					values: [
@@ -569,6 +640,10 @@ for (const map of mapped) {
 
 				item.declaration = undefined;
 			}
+		}
+
+		if (classes.length > 0) {
+			console.log('     ✓ Generated class declarations and items');
 		}
 
 		const parentData = parentDataBlobs.get(parentSlug)!;
@@ -594,10 +669,16 @@ for (const map of mapped) {
 				},
 			);
 		}
+
+		console.log(`   ✓ Generated data for ${module}/${item.path}`);
 	}
 
 	for (const [slug, data] of parentDataBlobs) {
 		for (const [key, value] of Object.entries(data)) {
+			if (value.array.length === 0) {
+				continue;
+			}
+
 			value.array.sort(compareItems);
 
 			await writeFile(
@@ -615,7 +696,11 @@ for (const map of mapped) {
 	} else {
 		generated.packages.multi.push(pkg);
 	}
+
+	console.log(` ✓ Finished generating data for ${module}`);
 }
+
+console.log(' - Writing data to files');
 
 await writeFile('./data/generated/all.js', `export default ${JSON.stringify(all)};`, {
 	encoding: 'utf8',
@@ -638,3 +723,6 @@ await writeFile('./data/generated/search.js', `export default ${JSON.stringify(s
 });
 
 await copyFile('./data/generated/search.js', './source/assets/javascript/data.js');
+
+console.log(' ✓ Finished writing data');
+console.log(' ✓ All done!');

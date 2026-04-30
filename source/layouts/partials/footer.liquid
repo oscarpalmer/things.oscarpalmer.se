@@ -1,6 +1,6 @@
 <footer class="stack stack--small footer" role="contentinfo">
   <p>&copy; 2026, <a href="https://oscarpalmer.se">{{ meta.author }}</a></p>
-  <p>Built with <a href="{{ meta.tools.eleventy.url }}">{{ meta.tools.eleventy.label }}</a>, <a href="{{ meta.tools.abydon.url }}">{{ meta.tools.abydon.label }}</a>, <a href="{{ meta.tools.atoms.url }}">{{ meta.tools.atoms.label }}</a>, and <a href="{{ meta.tools.suffix.url }}">{{ meta.tools.suffix.label }}</a>&hellip;</p>
+  <p>Built with <a href="{{ meta.tools.typedoc.url }}">{{ meta.tools.typedoc.label }}</a>, <a href="{{ meta.tools.eleventy.url }}">{{ meta.tools.eleventy.label }}</a>, <a href="{{ meta.tools.abydon.url }}">{{ meta.tools.abydon.label }}</a>, and <a href="{{ meta.tools.suffix.url }}">{{ meta.tools.suffix.label }}</a>&hellip;</p>
 </footer>
 
-<script src="/assets/javascript/search.mjs" type="module"></script>
+<script src="/assets/javascript/search.{{ timestamp.unix }}.mjs" type="module"></script>

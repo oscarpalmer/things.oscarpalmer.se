@@ -1,0 +1,84 @@
+{% if item.declaration.signatures %}
+  {% for signature in item.declaration.signatures %}
+    <article class="stack">
+      <h2 class="oui-vh">{{ item.name.original }}, #{{ forloop.index }}</h2>
+
+      <section>{{ signature.comment.summary | markdown }}</section>
+
+      <section class="stack">
+        <h3>Parameters</h3>
+
+        <ul class="stack stack--small">
+          {% for parameter in signature.parameters %}
+            <li class="flow">
+              <code>{{ parameter.name }}</code>
+              <code>{{ parameter | type }}</code>
+              <span>{{ parameter.comment.summary | markdown }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section class="stack">
+        <h3>Returns</h3>
+
+        <div class="flow">
+          <code>{{ signature.type.name }}</code>
+          {{ signature | returns }}
+        </div>
+      </section>
+
+      <section>{{ signature.code.items | last | code }}</section>
+
+      {{ signature | sourceUrl : paginated }}
+    </article>
+  {% endfor %}
+{% else %}
+  {% assign getSignature = item.declaration.getSignature %}
+  {% assign setSignature = item.declaration.setSignature %}
+  {% if getSignature %}
+    <article class="stack">
+      <h2>Get</h2>
+
+      <section>{{ getSignature.comment.summary | markdown }}</section>
+
+      <section class="stack">
+        <h3>Returns</h3>
+
+        <div class="flow">
+          <code>{{ getSignature.type.name }}</code>
+          {{ getSignature | returns }}
+        </div>
+      </section>
+
+      <section>{{ item.declaration.code.items | first | code }}</section>
+
+      {{ getSignature | sourceUrl : paginated }}
+    </article>
+  {% endif %}
+  {% if setSignature %}
+    <article class="stack">
+      <h2>Set</h2>
+
+      <section>{{ setSignature.comment.summary | markdown }}</section>
+
+      <section class="stack">
+        <h3>Parameter</h3>
+
+        <ul class="stack stack--small">
+          {% for parameter in setSignature.parameters %}
+            <li class="flow">
+              <code>{{ parameter.name }}</code>
+              <code>{{ parameter | type }}</code>
+              <span>{{ parameter.comment.summary | markdown }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <section>{{ item.declaration.code.items | last | code }}</section>
+
+      {{ setSignature | sourceUrl : paginated }}
+    </article>
+  {% endif %}
+{% endif %}
