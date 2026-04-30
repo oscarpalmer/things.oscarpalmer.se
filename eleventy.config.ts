@@ -39,8 +39,6 @@ export default config => {
 		unix: timestamp,
 	});
 
-	console.log(timestamp, new Date(timestamp).toISOString());
-
 	config.addGlobalData('version', process.env.ELEVENTY_VERSION || '???');
 
 	config.addFilter('breadcrumbs', getBreadcrumbs);

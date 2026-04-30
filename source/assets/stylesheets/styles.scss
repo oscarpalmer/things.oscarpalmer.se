@@ -14,6 +14,13 @@ body {
 	background-color: #fdfdfd;
 }
 
+a {
+	&:focus {
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
+	}
+}
+
 code,
 pre {
 	font-size: 0.875rem;
@@ -37,7 +44,21 @@ svg {
 	border-bottom: 1px solid #ddd;
 
 	&__navigation {
-		min-height: 2rem;
+		&--main {
+			min-height: 2rem;
+		}
+
+		&--breadcrumbs {
+			padding: .5rem 1rem;
+			margin: 0 -1rem -1rem;
+			border-top: 1px solid #ddd;
+			font-size: .75rem;
+		}
+	}
+
+	[aria-current] {
+		font-style: italic;
+		text-decoration: none;
 	}
 }
 
@@ -47,13 +68,6 @@ svg {
 	font-style: italic;
 }
 
-.breadcrumbs {
-	padding: .5rem 1rem;
-	border-bottom: 1px solid #ddd;
-	font-size: .75rem;
-}
-
-.breadcrumbs,
 .main {
 	background-color: #f7f7f7;
 }

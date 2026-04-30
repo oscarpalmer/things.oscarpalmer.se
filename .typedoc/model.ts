@@ -17,7 +17,7 @@ export type DataClassDeclaration = {
 	readonly constructors: DataValues<DataSimpleDeclaration>;
 	readonly methods: DataValues<DataSimpleDeclaration>;
 	readonly properties: DataValues<DataSimpleDeclaration>;
-	readonly name: DataName;
+	readonly self: DataSimpleDeclaration;
 };
 
 export type DataClassItem = {
@@ -131,6 +131,7 @@ export type DataPackage = {
 	readonly exports: DataItem[];
 	readonly name: DataName;
 	readonly json: Record<string, unknown>;
+	readonly url: string;
 };
 
 export type DataSearch = {

@@ -19,9 +19,9 @@
 	"devDependencies": {
 		"@11ty/eleventy": "^4.0.0-alpha.7",
 		"@oscarpalmer/abydon": "^0.21",
-		"@oscarpalmer/atoms": "^0.184",
+		"@oscarpalmer/atoms": "^0.185",
 		"@oscarpalmer/jhunal": "^0.27",
-		"@oscarpalmer/mora": "^0.28",
+		"@oscarpalmer/mora": "^0.29",
 		"@oscarpalmer/oui": "^0.20",
 		"@oscarpalmer/toretto": "^0.42",
 		"@oscarpalmer/timer": "^0.42",

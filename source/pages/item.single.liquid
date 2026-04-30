@@ -10,6 +10,7 @@ permalink: /{{ paginated.package.slug }}/{{ paginated.type.plural }}/{{ paginate
 
 {% if paginated.type.singular == 'class' %}
   {% assign item = generated[paginated.package.original].classes.map[paginated.name.original] %}
+  {{ item.self.declaration.comment.summary | markdown }}
   {% for type in generated.classes.types %}
     {% assign label = type.plural | capitalize %}
     {% render 'details.liquid', items: item[type.plural].array, label: label %}

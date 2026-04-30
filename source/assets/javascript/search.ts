@@ -119,7 +119,7 @@ html`<oui-popover>
 		<span>Search</span>
 	</button>
 	<div oui-popover-content class="search__content">
-		<h2 class="oui-vh">Search</h2>
+		<h1 class="oui-vh">Search</h1>
 		<form class="search__form" @submit="${onSubmit}">
 			<div class="stack stack--small">
 				<label class="oui-vh" for="search_input">Search term</label>

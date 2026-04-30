@@ -1,16 +1,36 @@
 <header class="stack stack-small header" role="banner">
-  <p><b>{{ meta.title }}</b><p>
-  <p>{{ meta.description }}</p>
-	<nav class="flow flow--small flex-ai--fe flex-jc--sb header__navigation" role="navigation">
-		<ul class="flow flow--small">
-			{% for pkg in generated.packages.all %}
-				<li><a href="{{ pkg.name.slug }}">{{ pkg.name.slug }}</a></li>
+	{% if pkg.url == page.url %}
+		{% assign ariaCurrent = ' aria-current="page"' %}
+	{% else %}
+		{% assign ariaCurrent = '' %}
+	{% endif %}
+	<p><a href="/"{{ ariaCurrent }}>{{ meta.title }}</a></p>
+	<p>{{ meta.description }}</p>
+	<nav class="stack stack--small" role="navigation">
+		<div class="flow flow--small flex-ai--fe flex-jc--sb">
+			<ul class="flow flow--small header__navigation--main">
+				{% for pkg in generated.packages.all %}
+					{% if pkg.url == page.url %}
+						{% assign ariaCurrent = ' aria-current="page"' %}
+					{% else %}
+						{% assign ariaCurrent = '' %}
+					{% endif %}
+					<li><a href="{{ pkg.url }}"{{ ariaCurrent }}>{{ pkg.name.original }}</a></li>
+				{% endfor %}
+			</ul>
+			<div id="search"></div>
+		</div>
+		<ol class="flow flow-small header__navigation--breadcrumbs">
+			{% for crumb in breadcrumbs %}
+				{% if forloop.last %}
+					{% assign ariaCurrent = ' aria-current="page"' %}
+				{% else %}
+					{% assign ariaCurrent = '' %}
+				{% endif %}
+				<li>
+					<span aria-hidden="true">/&nbsp;</span><a href="{{ crumb.url }}" {{ ariaCurrent }}>{{ crumb.label }}</a>
+				</li>
 			{% endfor %}
-		</ul>
-		<div id="search"></div>
+		</ol>
 	</nav>
 </header>
-
-<nav class="breadcrumbs">
-	{% render 'breadcrumbs.liquid', breadcrumbs: breadcrumbs %}
-</nav>

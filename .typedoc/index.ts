@@ -62,8 +62,6 @@ function getDeclarations(
 		declaration => {
 			const name = getName(declaration.name);
 
-			let signatures = declaration.signatures;
-
 			return {
 				declaration,
 				name,
@@ -320,10 +318,13 @@ for (const map of mapped) {
 
 	console.log(` - Generating data for ${module}`);
 
+	const name = getName(map.name);
+
 	const pkg: DataPackage = {
+		name,
 		exports: [],
-		name: getName(map.name),
 		json: map.pkg,
+		url: getUrl([name.slug]),
 	};
 
 	const parentExports = new Map<string, DataItem>();
@@ -540,7 +541,11 @@ for (const map of mapped) {
 				constructors,
 				methods,
 				properties,
-				name: className,
+				self: {
+					declaration: cls,
+					name: className,
+					url: classUrl,
+				},
 			};
 
 			const accessorItems = accessors.array.map(accessor => ({

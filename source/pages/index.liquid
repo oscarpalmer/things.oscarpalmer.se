@@ -6,7 +6,7 @@ layout: default
 
 {% for pkg in generated.packages.all %}
 	<article class="oui-card stack stack--text">
-		<h2><a href="{{ pkg.name.slug }}">{{ pkg.json.name }}</a></h2>
+		<h2><a href="/{{ pkg.name.slug }}/">{{ pkg.json.name }}</a></h2>
 		<p>{{ pkg.json.description }}</p>
 		<span class="flex-as--fs oui-tag version">{{ pkg.json.version }}</span>
 	</article>
