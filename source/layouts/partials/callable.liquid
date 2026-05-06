@@ -3,7 +3,13 @@
     <article class="stack">
       <h2 class="oui-vh">{{ item.name.original }}, #{{ forloop.index }}</h2>
 
-      <section>{{ signature.comment.summary | markdown }}</section>
+      <section class="stack">{{ signature.comment.summary | markdown }}</section>
+
+      <section class="stack example">
+        <h3>Example</h3>
+
+        {{ signature | example }}
+      </section>
 
       <section class="stack">
         <h3>Parameters</h3>
@@ -28,7 +34,11 @@
         </div>
       </section>
 
-      <section>{{ signature.code.items | last | code }}</section>
+      <section class="stack">
+        <h3>Declaration</h3>
+
+        {{ signature.code.items | last | code }}
+      </section>
 
       {{ signature | sourceUrl : paginated }}
     </article>
@@ -40,7 +50,13 @@
     <article class="stack">
       <h2>Get</h2>
 
-      <section>{{ getSignature.comment.summary | markdown }}</section>
+      <section class="stack">{{ getSignature.comment.summary | markdown }}</section>
+
+      <section class="stack example">
+        <h3>Example</h3>
+
+        {{ getSignature | example }}
+      </section>
 
       <section class="stack">
         <h3>Returns</h3>
@@ -60,7 +76,13 @@
     <article class="stack">
       <h2>Set</h2>
 
-      <section>{{ setSignature.comment.summary | markdown }}</section>
+      <section class="stack">{{ setSignature.comment.summary | markdown }}</section>
+
+      <section class="stack example">
+        <h3>Example</h3>
+
+        {{ setSignature | example }}
+      </section>
 
       <section class="stack">
         <h3>Parameter</h3>

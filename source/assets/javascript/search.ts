@@ -1,12 +1,49 @@
-import {array, computed, fragments, html, signal, type Fragment} from '@oscarpalmer/abydon';
+import {
+	array,
+	computed,
+	fragments,
+	html,
+	signal,
+	type Computed,
+	type Fragment,
+	type Fragments,
+	type ReactiveArray,
+	type Signal,
+} from '@oscarpalmer/abydon';
 import {includes} from '@oscarpalmer/atoms/string/match';
 import '@oscarpalmer/oui/popover';
 import type {DataSearch} from '../../../.typedoc/model';
-import data from './data.js'
+import data from './data.js';
+
+// #region Types
+
+type Empty = {
+	array: Computed<boolean>;
+	value: Computed<boolean>;
+};
+
+type Hide = {
+	empty: Computed<boolean>;
+	fragments: Computed<boolean>;
+	hint: Computed<boolean>;
+	truncation: Signal<boolean>;
+};
+
+type Search = {
+	array: ReactiveArray<SearchItem>;
+	count: Signal<number>;
+	fragments: Fragments;
+	original: SearchItem[];
+	value: Signal<string>;
+};
 
 type SearchItem = {
 	fragment?: Fragment;
 } & DataSearch;
+
+// #endregion
+
+// #region Functions
 
 function identifyItem(item: SearchItem): string {
 	return item.url;
@@ -51,97 +88,98 @@ function renderItem(item: SearchItem): Fragment {
 	return fragment;
 }
 
-const results = array<SearchItem>([]);
+// #endregion
 
-const value = signal('');
+// #region Variables
 
-value.subscribe(search => {
-	results.set(
-		(data as SearchItem[]).filter(item => {
-			if (search.trim().length === 0) {
-				return false;
-			}
+const search: Search = {
+	array: array<SearchItem>([]),
+	count: signal(0),
+	fragments: undefined as never as Fragments,
+	original: data as SearchItem[],
+	value: signal(''),
+};
 
-			if (item.name.original.includes(search)) {
+const empty: Empty = {
+	array: computed(() => search.array.get().length === 0),
+	value: computed(() => search.value.get().trim().length === 0),
+};
+
+const hide: Hide = {
+	empty: computed(() => {
+		const hasNoValue = empty.value.get();
+		const hasResults = !empty.array.get();
+
+		return hasNoValue || hasResults;
+	}),
+	fragments: computed(() => {
+		const hasValue = !empty.value.get();
+		const hasResults = !empty.array.get();
+
+		return !hasValue || !hasResults;
+	}),
+	hint: computed(() => !empty.value.get()),
+	truncation: signal(true),
+};
+
+search.fragments = fragments(search.array, identifyItem, renderItem);
+
+search.value.subscribe(value => {
+	const filtered = search.original.filter(item => {
+		if (value.length === 0) {
+			return false;
+		}
+
+		if (item.name.original.includes(value)) {
+			return true;
+		}
+
+		for (const itemValue of item.values) {
+			if (includes(itemValue, value)) {
 				return true;
 			}
+		}
 
-			for (const itemValue of item.values) {
-				if (includes(itemValue, search)) {
-					return true;
-				}
-			}
+		return false;
+	});
 
-			return false;
-		}),
-	);
+	const {length} = filtered;
+
+	search.count.set(length);
+
+	hide.truncation.set(length <= 25);
+
+	search.array.set(filtered.splice(0, 25));
 });
 
-const items = fragments(results as never, identifyItem, renderItem);
+// #endregion
 
-const emptyValue = computed(() => value.get().trim().length === 0);
-const emptyResults = computed(() => results.get().length === 0);
+// #region Render
 
-const hideHint = computed(() => value.get().trim().length > 0);
-
-const hideEmpty = computed(() => {
-	const hasNoValue = emptyValue.get();
-	const hasResults = !emptyResults.get();
-
-	return hasNoValue || hasResults;
-});
-
-const hideResults = computed(() => {
-	const hasValue = !emptyValue.get();
-	const hasResults = !emptyResults.get();
-
-	return !hasValue || !hasResults;
-});
-
-html`<oui-popover>
-	<button oui-popover-toggle class="oui-button oui-button--tiny" type="button">
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			width="24"
-			height="24"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="2"
-			stroke-linecap="round"
-			stroke-linejoin="round"
-			aria-hidden="true"
-		>
-			<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-			<path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
-			<path d="M21 21l-6 -6" />
-		</svg>
-		<span>Search</span>
-	</button>
-	<div oui-popover-content class="search__content">
-		<h1 class="oui-vh">Search</h1>
-		<form class="search__form" @submit="${onSubmit}">
-			<div class="stack stack--small">
-				<label class="oui-vh" for="search_input">Search term</label>
-				<input
-					autocomplete="off"
-					class="oui-input"
-					id="search_input"
-					spellcheck="false"
-					type="search"
-					value="${value}"
-				/>
-			</div>
-		</form>
-		<hr />
-		<div class="search__results">
-			<p class="search__results__message" hidden="${hideHint}">
-				Please enter a search term to see results
-			</p>
-			<p class="search__results__message" hidden="${hideEmpty}">There are no results</p>
-			<ul class="search__results__list" hidden="${hideResults}">
-				${items}
-			</ul>
+html`<h1 class="oui-vh">Search</h1>
+	<form class="search__form" @submit="${onSubmit}">
+		<div class="stack stack--small">
+			<label class="oui-vh" for="search_input">Search term</label>
+			<input
+				autocomplete="off"
+				class="oui-input"
+				id="search_input"
+				spellcheck="false"
+				type="search"
+				value="${search.value}"
+			/>
 		</div>
-	</div>
-</oui-popover>`.appendTo(document.querySelector('#search')!);
+	</form>
+	<hr />
+	<div class="search__results">
+		<p class="search__results__message" hidden="${hide.hint}">
+			Please enter a search term to see results
+		</p>
+		<p class="search__results__message" hidden="${hide.empty}">There are no results</p>
+		<p class="search__results__message search__results__message--truncation" hidden="${hide.truncation}">Showing ${() => search.array.length} results <i>(of ${search.count})</i></p>
+		<ul class="search__results__list" hidden="${hide.fragments}">
+			${search.fragments}
+		</ul>
+	</div>`.appendTo(document.querySelector('#search')!);
+
+// #endregion

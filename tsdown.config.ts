@@ -15,6 +15,7 @@ export default defineConfig({
 	},
 	dts: false,
 	entry: './source/assets/javascript/search.ts',
+	ignoreWatch: ['build/**'],
 	// logLevel: 'error',
 	minify: 'dce-only',
 	outDir: './build/assets/javascript',

@@ -1,4 +1,5 @@
 import {join} from '@oscarpalmer/atoms/string';
+import Shiki from '@shikijs/markdown-it';
 import MarkdownIt from 'markdown-it';
 import type {ParameterReflection, SignatureReflection} from 'typedoc';
 import type {DataItem} from '../.typedoc/model.ts';
@@ -7,6 +8,16 @@ import {findCrumb, renderCode} from './helpers.ts';
 const md = new MarkdownIt({
 	html: true,
 });
+
+md.use(
+	await Shiki({
+		defaultLanguage: 'typescript',
+		themes: {
+			dark: 'github-dark',
+			light: 'github-light',
+		},
+	}),
+);
 
 export async function getCode(code: string): Promise<string> {
 	return renderCode(code);
@@ -32,6 +43,12 @@ export function getBreadcrumbs(url: string) {
 	];
 }
 
+export function getExample(signature: SignatureReflection): string {
+	return renderMarkdown(
+		signature.comment?.blockTags?.find(tag => tag.tag === '@example')?.content ?? '',
+	);
+}
+
 export function getGroupUrl(item: DataItem): string {
 	return item.url.replace(/\/\w+$/, '');
 }
@@ -45,12 +62,18 @@ export function getReturns(signature: SignatureReflection): string {
 export function getSourceUrl(signature: SignatureReflection, item: DataItem): string {
 	const source = signature.sources![0];
 
-	const filename = source.fullFileName.replace(
+	if (source == null) {
+		return '';
+	}
+
+	const filename = source.fullFileName?.replace(
 		new RegExp(`^.+@oscarpalmer/${item.package.original}/src/`),
 		'',
 	);
 
-	return `<p><a href="https://github.com/oscarpalmer/${item.package.original}/blob/main/src/${filename}#L${source.line}">Source</a></p>`;
+	return filename == null
+		? ''
+		: `<p><a href="https://github.com/oscarpalmer/${item.package.original}/blob/main/src/${filename}#L${source.line}">Source</a></p>`;
 }
 
 export function getType(parameter: ParameterReflection): string {

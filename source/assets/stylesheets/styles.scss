@@ -16,8 +16,9 @@ body {
 
 a {
 	&:focus {
-		outline: 2px solid currentColor;
+		outline: 2px solid rgba(0, 0, 255, .5);
 		outline-offset: 2px;
+		border-radius: .25em;
 	}
 }
 
@@ -28,6 +29,13 @@ pre {
 
 hr {
 	border-color: #ddd;
+}
+
+pre {
+	&:focus {
+		outline: 2px solid rgba(0, 0, 255, .5);
+		outline-offset: 2px;
+	}
 }
 
 svg {
@@ -49,10 +57,10 @@ svg {
 		}
 
 		&--breadcrumbs {
-			padding: .5rem 1rem;
+			padding: 0.5rem 1rem;
 			margin: 0 -1rem -1rem;
 			border-top: 1px solid #ddd;
-			font-size: .75rem;
+			font-size: 0.75rem;
 		}
 	}
 
@@ -89,10 +97,14 @@ svg {
 	}
 }
 
-.search {
-	&__content {
-		padding: 0;
+.example {
+	&:has(h3:only-child) {
+		display: none;
 	}
+}
+
+.search {
+	padding: 0;
 
 	&__form {
 		padding: 1rem;
@@ -100,7 +112,23 @@ svg {
 
 	&__results {
 		&__message {
-			margin: 1rem;
+			padding: 1rem;
+
+			&--truncation {
+				background-color: var(--oui-yellow-0);
+				color: var(--oui-yellow-10);
+				font-size: .875rem;
+				position: relative;
+
+				&::after {
+					content: ' ';
+					height: .5em;
+					display: block;
+					position: absolute;
+					inset: 100% 0 auto 0;
+					background: linear-gradient(to bottom, rgba(0, 0, 0, 0.075), transparent);
+				}
+			}
 		}
 
 		&__list {
@@ -125,4 +153,24 @@ svg {
 	font-size: 0.75rem;
 	font-weight: normal;
 	font-variant-numeric: tabular-nums;
+}
+
+oui-popover:not(:defined) {
+	position: relative;
+
+	&:focus-within {
+		[oui-popover-content] {
+			display: block;
+		}
+	}
+
+	[oui-popover-content] {
+		min-width: 12rem;
+		padding: 1rem;
+		margin: .5em 0 0;
+		display: none;
+		position: absolute;
+		inset: 100% 0 auto auto;
+		pointer-events: none;
+	}
 }

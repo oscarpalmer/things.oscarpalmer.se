@@ -3,6 +3,7 @@ import {getTitle} from './.11ty/codes.ts';
 import {
 	getBreadcrumbs,
 	getCode,
+	getExample,
 	getGroupUrl,
 	getReturns,
 	getSourceUrl,
@@ -43,6 +44,7 @@ export default config => {
 
 	config.addFilter('breadcrumbs', getBreadcrumbs);
 	config.addFilter('code', getCode);
+	config.addFilter('example', getExample);
 	config.addFilter('groupUrl', getGroupUrl);
 	config.addFilter('markdown', renderMarkdown);
 	config.addFilter('returns', getReturns);
@@ -55,8 +57,6 @@ export default config => {
 		'source/assets/images': 'assets/images',
 		'source/robots.txt': 'robots.txt',
 	});
-
-	config.addWatchTarget('source');
 
 	config.setServerOptions(options.browser);
 

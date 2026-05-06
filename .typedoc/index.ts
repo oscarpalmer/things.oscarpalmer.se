@@ -12,9 +12,10 @@ import MarkdownIt from 'markdown-it';
 import {copyFile, mkdir, writeFile} from 'node:fs/promises';
 import {
 	Application,
-	type DeclarationReflection,
+	DeclarationReflection,
 	type ProjectReflection,
 	ReflectionKind,
+	Serializer,
 } from 'typedoc';
 import type {
 	DataBlob,
@@ -66,7 +67,7 @@ function getDeclarations(
 				declaration,
 				name,
 				url: getUrl([prefix, getKinds(kind), name.slug]),
-			};
+			} as DataSimpleDeclaration;
 		},
 	);
 
@@ -295,10 +296,13 @@ const mapped = [
 		items: getMapped(torettoPackage.exports),
 		name: 'toretto',
 		pkg: torettoPackage,
+		single: false,
 	}, */
 ];
 
 const plugin = new URL('./plugin.ts', import.meta.url).pathname;
+
+// const serializer = new Serializer();
 
 const types = {
 	accessor: getType('accessor'),
@@ -664,7 +668,17 @@ for (const map of mapped) {
 		Object.assign(parentData.classes.map, data.classes.map);
 
 		for (const [key, value] of Object.entries(data)) {
+			if (value.array.length === 0) {
+				continue;
+			}
+
 			value.array.sort(compareItems);
+
+			for (const item of value.array) {
+				if (item.declaration instanceof DeclarationReflection) {
+					// item.declaration = item.declaration.toObject(serializer) as never;
+				}
+			}
 
 			await writeFile(
 				`./data/generated/${map.name}/${name}/${key}.js`,
@@ -685,6 +699,12 @@ for (const map of mapped) {
 			}
 
 			value.array.sort(compareItems);
+
+			for (const item of value.array) {
+				if (item.declaration instanceof DeclarationReflection) {
+					// item.declaration = item.declaration.toObject(serializer) as never;
+				}
+			}
 
 			await writeFile(
 				`./data/generated/${map.name}/${slug}/${key}.js`,

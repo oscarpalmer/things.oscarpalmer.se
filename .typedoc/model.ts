@@ -144,7 +144,7 @@ export type DataSearch = {
 
 export type DataSimpleDeclaration = {
 	code?: unknown[];
-	declaration: Partial<DeclarationReflection>;
+	declaration: DeclarationReflection;
 	name: DataName;
 	url: string;
 };
