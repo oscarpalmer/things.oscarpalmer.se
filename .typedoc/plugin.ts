@@ -40,16 +40,10 @@ function getDeclarations(
 }
 
 function getNode(declaration: ts.Declaration) {
-	return ts.isVariableDeclaration(declaration)
-		? declaration.parent
-		: declaration;
+	return ts.isVariableDeclaration(declaration) ? declaration.parent : declaration;
 }
 
-function handle(
-	context: Context,
-	reflection: Reflection,
-	signature?: ts.SignatureDeclaration,
-) {
+function handle(context: Context, reflection: Reflection, signature?: ts.SignatureDeclaration) {
 	if (reflection.isProject()) {
 		return;
 	}
@@ -59,8 +53,7 @@ function handle(
 		source: '',
 	};
 
-	const declarations =
-		signature == null ? getDeclarations(context, reflection) : [signature];
+	const declarations = signature == null ? getDeclarations(context, reflection) : [signature];
 
 	if (declarations.length === 0) {
 		return;
@@ -95,11 +88,7 @@ export function load(application: Application): void {
 
 	application.converter.on(
 		Converter.EVENT_CREATE_SIGNATURE,
-		(
-			context: Context,
-			reflection: SignatureReflection,
-			signature?: unknown,
-		): void => {
+		(context: Context, reflection: SignatureReflection, signature?: unknown): void => {
 			if (shouldParseSignature(context, reflection)) {
 				handle(context, reflection, signature as ts.SignatureDeclaration);
 			}
@@ -107,10 +96,7 @@ export function load(application: Application): void {
 	);
 }
 
-function shouldParseDeclaration(
-	context: Context,
-	reflection: DeclarationReflection,
-): boolean {
+function shouldParseDeclaration(context: Context, reflection: DeclarationReflection): boolean {
 	const symbol = context.getSymbolFromReflection(reflection);
 
 	if (
@@ -123,10 +109,7 @@ function shouldParseDeclaration(
 	return (symbol?.declarations?.length ?? 0) > 1;
 }
 
-function shouldParseSignature(
-	context: Context,
-	reflection: SignatureReflection,
-): boolean {
+function shouldParseSignature(context: Context, reflection: SignatureReflection): boolean {
 	const symbol = context.getSymbolFromReflection(reflection?.parent);
 
 	return (

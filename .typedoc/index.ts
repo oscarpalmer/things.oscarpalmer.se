@@ -9,7 +9,7 @@ import moraPackage from '@oscarpalmer/mora/package.json' with {type: 'json'};
 import timerPackage from '@oscarpalmer/timer/package.json' with {type: 'json'};
 import torettoPackage from '@oscarpalmer/toretto/package.json' with {type: 'json'};
 import MarkdownIt from 'markdown-it';
-import {copyFile, mkdir, writeFile} from 'node:fs/promises';
+import {copyFile, mkdir, rm, writeFile} from 'node:fs/promises';
 import {
 	Application,
 	DeclarationReflection,
@@ -204,6 +204,13 @@ function mapper(key: string, value: {default: string}): DataMapped | undefined {
 	};
 }
 
+async function prepare(): Promise<void> {
+	await rm('./data/generated', {recursive: true, force: true});
+	await mkdir('./data/generated', {recursive: true});
+
+	return writeFile('./data/generated/all.js', '', {});
+}
+
 export function renderMarkdown(value: unknown) {
 	return typeof value === 'string'
 		? md.render(value)
@@ -316,6 +323,8 @@ const types = {
 	property: getType('property'),
 	variable: getType('variable'),
 };
+
+await prepare();
 
 for (const map of mapped) {
 	const module = `@oscarpalmer/${map.name}`;
@@ -732,10 +741,6 @@ await writeFile('./data/generated/all.js', `export default ${JSON.stringify(all)
 });
 
 for (const [key, value] of Object.entries(generated)) {
-	if (Array.isArray(value)) {
-		value.sort((first, second) => first.name.original.localeCompare(second.name.original));
-	}
-
 	await writeFile(`./data/generated/${key}.js`, `export default ${JSON.stringify(value)};`, {
 		encoding: 'utf8',
 	});

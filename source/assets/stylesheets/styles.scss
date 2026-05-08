@@ -16,9 +16,9 @@ body {
 
 a {
 	&:focus {
-		outline: 2px solid rgba(0, 0, 255, .5);
+		outline: 2px solid rgba(0, 0, 255, 0.5);
 		outline-offset: 2px;
-		border-radius: .25em;
+		border-radius: 0.25em;
 	}
 }
 
@@ -33,7 +33,7 @@ hr {
 
 pre {
 	&:focus {
-		outline: 2px solid rgba(0, 0, 255, .5);
+		outline: 2px solid rgba(0, 0, 255, 0.5);
 		outline-offset: 2px;
 	}
 }
@@ -117,12 +117,12 @@ svg {
 			&--truncation {
 				background-color: var(--oui-yellow-0);
 				color: var(--oui-yellow-10);
-				font-size: .875rem;
+				font-size: 0.875rem;
 				position: relative;
 
 				&::after {
 					content: ' ';
-					height: .5em;
+					height: 0.5em;
 					display: block;
 					position: absolute;
 					inset: 100% 0 auto 0;
@@ -167,7 +167,7 @@ oui-popover:not(:defined) {
 	[oui-popover-content] {
 		min-width: 12rem;
 		padding: 1rem;
-		margin: .5em 0 0;
+		margin: 0.5em 0 0;
 		display: none;
 		position: absolute;
 		inset: 100% 0 auto auto;

@@ -176,7 +176,12 @@ html`<h1 class="oui-vh">Search</h1>
 			Please enter a search term to see results
 		</p>
 		<p class="search__results__message" hidden="${hide.empty}">There are no results</p>
-		<p class="search__results__message search__results__message--truncation" hidden="${hide.truncation}">Showing ${() => search.array.length} results <i>(of ${search.count})</i></p>
+		<p
+			class="search__results__message search__results__message--truncation"
+			hidden="${hide.truncation}"
+		>
+			Showing ${() => search.array.length} results <i>(of ${search.count})</i>
+		</p>
 		<ul class="search__results__list" hidden="${hide.fragments}">
 			${search.fragments}
 		</ul>

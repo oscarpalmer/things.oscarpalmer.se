@@ -1,6 +1,6 @@
 {
 	"name": "things.oscarpalmer.se",
-	"version": "26.5.6",
+	"version": "26.5.8",
 	"private": true,
 	"description": "Things I've made: utilities, demos, experiments, and other whatchamacallits.",
 	"homepage": "https://github.com/oscarpalmer/things.oscarpalmer.se",
@@ -19,12 +19,12 @@
 	"devDependencies": {
 		"@11ty/eleventy": "^4.0.0-alpha.7",
 		"@oscarpalmer/abydon": "^0.23",
-		"@oscarpalmer/atoms": "^0.185",
+		"@oscarpalmer/atoms": "^0.186",
 		"@oscarpalmer/jhunal": "^0.27",
 		"@oscarpalmer/mora": "^0.29",
 		"@oscarpalmer/oui": "^0.20",
-		"@oscarpalmer/toretto": "^0.45",
 		"@oscarpalmer/timer": "^0.42",
+		"@oscarpalmer/toretto": "^0.45",
 		"@oxlint/plugins": "^1.63",
 		"@shikijs/markdown-it": "^4",
 		"@types/markdown-it": "^14.1",
@@ -35,11 +35,11 @@
 		"pkg-types": "^2.3",
 		"sass": "^1.99",
 		"shiki": "^4",
-		"tsdown": "^0.21",
+		"tsdown": "^0.22",
 		"tsx": "^4.21",
 		"typedoc": "^0.28",
-		"typescript": "^5.9",
-		"vite": "npm:@voidzero-dev/vite-plus-core@latest",
+		"typescript": "^6",
+		"vite": "^8",
 		"vite-plus": "latest"
 	},
 	"packageManager": "npm@11.12.1"

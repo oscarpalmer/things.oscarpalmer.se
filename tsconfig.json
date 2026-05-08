@@ -28,5 +28,10 @@
 		"verbatimModuleSyntax": true
 	},
 	"exclude": [],
-	"include": ["./.11ty/*.ts", "./.typedoc/*.ts", "./node_modules/@oscarpalmer/**/*.ts", "./src/**/*.ts"]
+	"include": [
+		"./.11ty/*.ts",
+		"./.typedoc/*.ts",
+		"./node_modules/@oscarpalmer/**/*.ts",
+		"./src/**/*.ts"
+	]
 }
